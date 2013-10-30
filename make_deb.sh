@@ -1,6 +1,6 @@
 #!/bin/sh
 
-PROJECT_NAME="pyrox"
+PROJECT_NAME="pyrox-meniscus"
 PROJECT_VERSION="$(cat pyrox/VERSION)"
 
 python build.py ${PROJECT_NAME}
