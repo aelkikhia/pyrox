@@ -31,7 +31,9 @@ _DEFAULTS = {
         'auth_token': None,
         'timeout': 5,
         'insecure': False,
-        'endpoint': 'http://localhost:35357/v2.0/tokens'
+        'endpoint': 'http://localhost:35357/v2.0/tokens',
+        'route_to': 'http://localhost:80/',
+        'url_replacement': ''
     }
 }
 
@@ -358,3 +360,19 @@ class KeystoneConfiguration(ConfigurationPart):
         Returns the Keystone server admin URL
         """
         return self.get('endpoint')
+
+    @property
+    def route_to(self):
+        """
+        Returns the route the Keystone auth filter will use to
+        to forward authenticated requests to
+        """
+        return self.get('route_to')
+
+    @property
+    def url_replacement(self):
+        """
+        Returns which part of the URL you want replaced, in the
+        case of ElasticSearch this will be: _all
+        """
+        return self.get('url_replacement')

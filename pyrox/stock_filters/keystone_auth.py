@@ -25,29 +25,33 @@ class KeystoneTokenValidationFilter(filtering.HttpFilter):
             endpoint=self.config.keystone.endpoint,
             insecure=self.config.keystone.insecure)
 
+    def _prepare_route(self, request, tenant_id):
+        request.remove_header(X_AUTH_TOKEN)
+        request.remove_header(X_TENANT_NAME)
+        return '{0}{1}'.format(
+            self.config.route_to, request.url.replace(
+                self.config.keystone.url_replacement, tenant_id))
+
     @filtering.handles_request_head
     def on_request_head(self, request_head):
-        token_hdr = request_head.get_header(X_AUTH_TOKEN)
-        tenant_name_hdr = request_head.get_header(X_TENANT_NAME)
+        try:
+            token_hdr = request_head.get_header(X_AUTH_TOKEN)
+            tenant_name_hdr = request_head.get_header(X_TENANT_NAME)
 
-        if (token_hdr and len(token_hdr.values[0]) >= 1) and \
-                (tenant_name_hdr and len(tenant_name_hdr.values[0]) >= 1):
-            try:
+            if (token_hdr and len(token_hdr.values[0]) >= 1) and \
+                    (tenant_name_hdr and len(tenant_name_hdr.values[0]) >= 1):
+
                 auth_result = self.admin_client.tokens.authenticate(
                     token=token_hdr.values[0],
                     tenant_name=tenant_name_hdr.values[0])
 
                 if auth_result:
-                    request_head.remove_header(X_AUTH_TOKEN)
-                    request_head.remove_header(X_TENANT_NAME)
-                    tenant_id = auth_result.tenant.get('id', None)
-                    return filtering.route(
-                        'http://domain.com/?={}'.format(tenant_id))
-                    #return filtering.next()
+                    return filtering.route(self._prepare_route(
+                        request_head, auth_result.tenant.get('id', None)))
 
-            except Unauthorized:
-                filtering.reject(response=self.reject_response)
-            except Exception as ex:
-                _LOG.exception(ex)
+        except Unauthorized:
+            filtering.reject(response=self.reject_response)
+        except Exception as ex:
+            _LOG.exception(ex)
 
         return filtering.reject(response=self.reject_response)
