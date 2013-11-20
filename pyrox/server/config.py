@@ -26,6 +26,12 @@ _DEFAULTS = {
         'console': True,
         'logfile': None,
         'verbosity': 'WARNING'
+    },
+    'keystone': {
+        'auth_token': None,
+        'timeout': 5,
+        'insecure': False,
+        'endpoint': 'http://localhost:35357/v2.0/tokens'
     }
 }
 
@@ -316,3 +322,39 @@ class RoutingConfiguration(ConfigurationPart):
         """
         hosts = self.get('upstream_hosts')
         return [host for host in _split_and_strip(hosts, ',')]
+
+
+class KeystoneConfiguration(ConfigurationPart):
+    """
+    Class mapping for the Portal configuration section 'keystone'
+    """
+    @property
+    def auth_token(self):
+        """
+        Returns the Keystone auth_token
+        """
+        return self.get('auth_token')
+
+    @property
+    def timeout(self):
+        """
+        Returns the Keystone HTTP timeout
+        """
+        return self.getint('timeout')
+
+    @property
+    def insecure(self):
+        """
+        Returns whether to allow keystoneclient to perform "insecure"
+        TLS (https) requests. The server's certificate will
+        not be verified against any certificate authorities.
+        This option should be used with caution.
+        """
+        return self.get('insecure')
+
+    @property
+    def endpoint(self):
+        """
+        Returns the Keystone server admin URL
+        """
+        return self.get('endpoint')
