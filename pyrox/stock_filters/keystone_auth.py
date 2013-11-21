@@ -6,6 +6,8 @@ from pyrox.server.config import load_pyrox_config
 from keystoneclient.v2_0.client import Client as KeystoneClient
 from keystoneclient.exceptions import Unauthorized
 
+import redis
+
 
 _LOG = get_logger(__name__)
 X_AUTH_TOKEN = 'X-Auth-Token'
@@ -18,7 +20,13 @@ class KeystoneTokenValidationFilter(filtering.HttpFilter):
         self.reject_response = HttpResponse()
         self.reject_response.status = '401 Unauthorized'
         self.reject_response.header('Content-Length').values.append('0')
+
         self.config = load_pyrox_config()
+
+        self.redis = redis.StrictRedis(host=self.config.redis.host,
+                                       port=self.config.redis.port,
+                                       db=self.config.redis.db)
+
         self.admin_client = KeystoneClient(
             token=self.config.keystone.auth_token,
             timeout=self.config.keystone.timeout,

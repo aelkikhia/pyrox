@@ -34,6 +34,11 @@ _DEFAULTS = {
         'endpoint': 'http://localhost:35357/v2.0/tokens',
         'route_to': 'http://localhost:80/',
         'url_replacement': ''
+    },
+    'redis': {
+        'host': 'localhost',
+        'port': 6379,
+        'db': '0'
     }
 }
 
@@ -123,7 +128,7 @@ class CoreConfiguration(ConfigurationPart):
 
 class SSLConfiguration(ConfigurationPart):
     """
-    Class mapping for the Portal configuration section 'ssl'
+    Class mapping for the Pyrox configuration section 'ssl'
     """
     @property
     def cert_file(self):
@@ -328,7 +333,7 @@ class RoutingConfiguration(ConfigurationPart):
 
 class KeystoneConfiguration(ConfigurationPart):
     """
-    Class mapping for the Portal configuration section 'keystone'
+    Class mapping for the Pyrox configuration section 'keystone'
     """
     @property
     def auth_token(self):
@@ -376,3 +381,29 @@ class KeystoneConfiguration(ConfigurationPart):
         case of ElasticSearch this will be: _all
         """
         return self.get('url_replacement')
+
+
+class RedisConfiguration(ConfigurationPart):
+    """
+    Class mapping for the Pyrox configuration section 'redis'
+    """
+    @property
+    def host(self):
+        """
+        Returns the Redis host
+        """
+        return self.get('host')
+
+    @property
+    def port(self):
+        """
+        Returns the Redis port
+        """
+        return self.getint('port')
+
+    @property
+    def db(self):
+        """
+        Returns the Redis db
+        """
+        return self.get('db')
