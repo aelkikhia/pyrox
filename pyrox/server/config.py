@@ -38,7 +38,8 @@ _DEFAULTS = {
     'redis': {
         'host': 'localhost',
         'port': 6379,
-        'db': '0'
+        'db': '0',
+        'ttl': 3600
     }
 }
 
@@ -407,3 +408,10 @@ class RedisConfiguration(ConfigurationPart):
         Returns the Redis db
         """
         return self.get('db')
+
+    @property
+    def ttl(self):
+        """
+        Returns the Redis time to live (in seconds)
+        """
+        return self.getint('ttl')
