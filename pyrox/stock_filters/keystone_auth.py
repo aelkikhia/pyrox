@@ -74,7 +74,7 @@ class KeystoneTokenValidationFilter(filtering.HttpFilter):
 
                 if token_in_cache:
                     return filtering.route(self._prepare_route(
-                        request_head, self._cache_get_tenant_id()))
+                        request_head, self._cache_get_tenant_id(token)))
 
         except Unauthorized:
             filtering.reject(response=self.reject_response)
